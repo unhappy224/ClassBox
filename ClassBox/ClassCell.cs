@@ -13,6 +13,9 @@ namespace ClassBox
             Model = model; 
             switch (model.Type)
             {
+                case ClassCellModelType.None:
+                    this.BackgroundColor = Constants.MainBackgroundColor;
+                    break;
                 case ClassCellModelType.Class:
                     var tv = new UITextView();
                     this.Add(tv);
@@ -21,6 +24,7 @@ namespace ClassBox
                     tv.TextColor = model.TextColor;  
                     tv.Delegate = this;
                     tv.Text = model.ClassName + Environment.NewLine + "@" + model.ClassRoom;
+                    tv.Font = UIFont.SystemFontOfSize(16);
                     var ges = new UITapGestureRecognizer(r =>
                         {
                             if (Tapped != null)

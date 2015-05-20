@@ -2,6 +2,7 @@
 
 using UIKit;
 using PureLayout;
+using CoreGraphics;
 
 namespace ClassBox
 {
@@ -28,20 +29,17 @@ namespace ClassBox
            
             cell.LB_Time.Text = "8:40";
             cell.LB_Node.Text = "1";
+
+            var vc = new ClassBoxViewController(new CGRect(0, 50, View.Frame.Width, 600));
+            View.Add(vc.View);
+             
         }
 
-        public override void DidReceiveMemoryWarning()
-        {
-            base.DidReceiveMemoryWarning();
-            // Release any cached data, images, etc that aren't in use.
-          
-
-        }
+        
 
         partial void UIButton10_TouchUpInside(UIButton sender)
         {
-            this.ShowDetailViewController(new ClassBoxViewController(View.Frame), null);
-
+           
 
         }
     }

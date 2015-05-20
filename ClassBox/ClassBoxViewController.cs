@@ -15,8 +15,7 @@ namespace ClassBox
         public ClassBoxViewController(CGRect frame)
             : base()
         {
-            View.Frame = frame;
-          
+            View.Frame = frame; 
         }
 
         public UITableView ClassTableView { get; private set; }
@@ -24,6 +23,12 @@ namespace ClassBox
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            var leftView = new LeftTableView(LeftModelFactory.Create());
+            var scv = new UIScrollView();
+            ClassTableView = new UITableView();
+             
+
             var datas = ClassCellModelFactory.CreateFromClassModel(new []
                 {
                     new ClassModel(){ DayInWeek = 1, Node = 1, Name = "1+1", Room = "1-1" },
@@ -37,29 +42,43 @@ namespace ClassBox
                             
                 });
 
-            ClassTableView = new UITableView();
-            ClassTableView.Frame = new CGRect(0, 0, Constants.CellWidth * Constants.DayInWeek, View.Frame.Height);
+           
+//            ClassTableView.Frame = new CGRect(0, 0, Constants.CellWidth * (Constants.DayInWeek - 1) + Constants.SelectCellWidth, View.Frame.Height);
+           
+           
             ClassTableView.Bounces = false;
             ClassTableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
+            ClassTableView.BackgroundColor = Constants.MainBackgroundColor;
+            ClassTableView.Source = new ClassTableViewSource(ClassTableView, datas, leftView);
             
-            ClassTableView.Source = new ClassTableViewSource(ClassTableView, datas);
-          
-            var scv = new UIScrollView();
+
             View.Add(scv);
             scv.AutoPinEdgesToSuperviewEdgesWithInsets(new UIEdgeInsets(0, Constants.LeftWidth, 0, 0));
             scv.AddSubview(ClassTableView);
+            ClassTableView.AutoSetDimension(ALDimension.Width, Constants.CellWidth * (Constants.DayInWeek - 1) + Constants.SelectCellWidth);
+            ClassTableView.AutoMatchDimension(ALDimension.Height, ALDimension.Height, scv);
+            ClassTableView.AutoPinEdgeToSuperviewEdge(ALEdge.Top);
+            ClassTableView.AutoPinEdgeToSuperviewEdge(ALEdge.Left);
             scv.Bounces = false;
-            scv.ContentSize = new CGSize(ClassTableView.Frame.Width, 0);
+           
+            scv.ContentSize = new CGSize(Constants.CellWidth * (Constants.DayInWeek - 1) + Constants.SelectCellWidth, 0);
 
-            var leftView = new LeftTableView(LeftModelFactory.Create());
+
             View.Add(leftView);
-            leftView.AutoPinEdgesToSuperviewEdgesWithInsets(UIEdgeInsets.Zero, ALEdge.Right)[0].Constant = Constants.HeaderHeight;
-            leftView.AutoPinEdge(ALEdge.Right, ALEdge.Left, scv);
-            leftView.BackgroundColor = UIColor.Green;
+            leftView.AutoPinEdgesToSuperviewEdgesWithInsets(new UIEdgeInsets(Constants.HeaderHeight, 0, 0, 0), ALEdge.Right);
+            leftView.AutoPinEdge(ALEdge.Right, ALEdge.Left, scv); 
+            leftView.ScrollEnabled = false;
+            this.View.BackgroundColor = UIColor.Orange;
+        }
 
-            scv.BackgroundColor = UIColor.Orange;
-            View.BackgroundColor = UIColor.Orange;
-             
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+        }
+
+        void ClassTableView_Scrolled(object sender, EventArgs e)
+        {
+            
         }
 
         private class ClassTableViewSource : UITableViewSource
@@ -67,10 +86,33 @@ namespace ClassBox
             public UITableView tableView;
             public ClassCellModel[][] Datas;
 
-            public ClassTableViewSource(UITableView tablaView, ClassCellModel[][] datas)
+            public UITableView LeftView;
+
+            public ClassTableViewSource(UITableView tablaView, ClassCellModel[][] datas, UITableView leftView)
             {
                 this.tableView = tablaView;
                 Datas = datas;
+                LeftView = leftView;
+            }
+
+            public override void Scrolled(UIScrollView scrollView)
+            {
+//                CGFloat offsetY= self.myTableView.contentOffset.y;
+//                CGPoint timeOffsetY=self.timeView.timeTableView.contentOffset;
+//                timeOffsetY.y=offsetY;
+//                self.timeView.timeTableView.contentOffset=timeOffsetY;
+//                if(offsetY==0){
+//                    self.timeView.timeTableView.contentOffset=CGPointZero;
+//                }
+                if (LeftView == null)
+                    return;
+                var offsetY = tableView.ContentOffset.Y;
+                var leftOffset = LeftView.ContentOffset;
+                LeftView.ContentOffset = new CGPoint(leftOffset.X, offsetY);
+                if (offsetY == 0)
+                {
+                    LeftView.ContentOffset = CGPoint.Empty;
+                }
             }
 
             public override nint RowsInSection(UITableView tableview, nint section)
@@ -101,16 +143,17 @@ namespace ClassBox
                 return Constants.HeaderHeight;
             }
 
-            public UIView headView;
+            public HeaderRow header;
 
             public override UIView GetViewForHeader(UITableView tableView, nint section)
             {
-                if (headView == null)
+                if (header == null)
                 {
-                    headView = new UIView(new CGRect(0, 0, tableView.Frame.Width, 50));
-                    headView.BackgroundColor = UIColor.Red;
+                    header = new HeaderRow(HeaderModelFactory.Create());
+                    header.Frame = new CGRect(0, 0, tableView.Frame.Width, Constants.HeaderHeight);
+                    header.Display((int)DateTime.Now.DayOfWeek - 1);
                 }
-                return headView;
+                return header;
             }
 
             

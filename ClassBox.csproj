@@ -71,6 +71,9 @@
     <Reference Include="PureLayout">
       <HintPath>PureLayout.dll</HintPath>
     </Reference>
+    <Reference Include="RandomColor">
+      <HintPath>RandomColor.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />
@@ -84,6 +87,7 @@
     <None Include="Entitlements.plist" />
     <None Include="packages.config" />
     <None Include="PureLayout.dll" />
+    <None Include="RandomColor.dll" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
@@ -104,6 +108,7 @@
     <Compile Include="ClassBox\LeftModel.cs" />
     <Compile Include="ClassBox\HeaderRow.cs" />
     <Compile Include="ClassBox\HeaderCell.cs" />
+    <Compile Include="ClassBox\HeaderModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>

@@ -9,13 +9,9 @@ namespace ClassBox
         //大节
         public int Node;
 
-
         public string Name;
         public string Room;
-
-        public ClassModel()
-        {
-        }
+         
     }
 }
 

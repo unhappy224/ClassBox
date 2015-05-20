@@ -1,5 +1,6 @@
 ﻿using System;
 using UIKit;
+using RandomColorGenerator;
 
 namespace ClassBox
 {
@@ -21,9 +22,10 @@ namespace ClassBox
         {
             Type = type;
             Model = model;
+           
             if (model != null)
             {
-                Background = Helper.GetRandomColor();
+                Background = RandomColor.GetColor(ColorScheme.Random, Luminosity.Bright);
                 TextColor = UIColor.White;
                 ClassName = model.Name;
                 ClassRoom = model.Room;

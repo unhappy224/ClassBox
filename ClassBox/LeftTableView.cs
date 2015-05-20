@@ -14,7 +14,8 @@ namespace ClassBox
             Models = models;
             this.Source = new LeftTableViewSource(models);
             this.Bounces = false;
-            this.SeparatorStyle = UITableViewCellSeparatorStyle.None;
+            this.SeparatorStyle = UITableViewCellSeparatorStyle.None; 
+            BackgroundColor = Constants.MainBackgroundColor; 
         }
 
         public class LeftTableViewSource : UITableViewSource
@@ -44,6 +45,7 @@ namespace ClassBox
                     cell = new LeftCell(); 
                 cell.SelectionStyle = UITableViewCellSelectionStyle.None;
                 cell.WillDisplay(Models[indexPath.Row]);
+
                 return cell;
             }
         }
@@ -73,6 +75,7 @@ namespace ClassBox
                 this.Layer.BorderColor = UIColor.Black.CGColor;
                 this.ContentView.Add(LB_Time);
                 this.ContentView.Add(LB_Node);
+                BackgroundColor = Constants.MainBackgroundColor; 
             }
 
             public void WillDisplay(LeftModel model)
