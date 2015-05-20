@@ -7,15 +7,21 @@ namespace ClassBox
 {
     public class ClassBoxViewController : UIViewController
     {
+        public int SelectIndex = (int)DateTime.Now.DayOfWeek - 1;
+
+        public readonly ClassModel[] Classes;
+
         public ClassBoxViewController(IntPtr handle)
             : base(handle)
         {
         }
 
-        public ClassBoxViewController(CGRect frame)
+        public ClassBoxViewController(CGRect frame, ClassModel[] classes)
             : base()
         {
-            View.Frame = frame; 
+            Classes = classes;
+            View.Frame = frame;  
+
         }
 
         public UITableView ClassTableView { get; private set; }
@@ -29,18 +35,7 @@ namespace ClassBox
             ClassTableView = new UITableView();
              
 
-            var datas = ClassCellModelFactory.CreateFromClassModel(new []
-                {
-                    new ClassModel(){ DayInWeek = 1, Node = 1, Name = "1+1", Room = "1-1" },
-                    new ClassModel(){ DayInWeek = 1, Node = 2, Name = "1+1", Room = "1-1" },
-                    new ClassModel(){ DayInWeek = 2, Node = 4, Name = "1+1", Room = "1-1" },
-                    new ClassModel(){ DayInWeek = 2, Node = 5, Name = "1+1", Room = "1-1" },
-                    new ClassModel(){ DayInWeek = 3, Node = 2, Name = "1+1", Room = "1-1" },
-                    new ClassModel(){ DayInWeek = 4, Node = 3, Name = "1+1", Room = "1-1" },
-                    new ClassModel(){ DayInWeek = 5, Node = 4, Name = "1+1", Room = "1-1" },
-                    new ClassModel(){ DayInWeek = 6, Node = 6, Name = "1+1", Room = "1-1" }
-                            
-                });
+            var datas = ClassCellModelFactory.CreateFromClassModel(Classes);
 
            
 //            ClassTableView.Frame = new CGRect(0, 0, Constants.CellWidth * (Constants.DayInWeek - 1) + Constants.SelectCellWidth, View.Frame.Height);
@@ -49,7 +44,7 @@ namespace ClassBox
             ClassTableView.Bounces = false;
             ClassTableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
             ClassTableView.BackgroundColor = Constants.MainBackgroundColor;
-            ClassTableView.Source = new ClassTableViewSource(ClassTableView, datas, leftView);
+            ClassTableView.Source = new ClassTableViewSource(this, datas, leftView);
             
 
             View.Add(scv);
@@ -68,45 +63,44 @@ namespace ClassBox
             leftView.AutoPinEdgesToSuperviewEdgesWithInsets(new UIEdgeInsets(Constants.HeaderHeight, 0, 0, 0), ALEdge.Right);
             leftView.AutoPinEdge(ALEdge.Right, ALEdge.Left, scv); 
             leftView.ScrollEnabled = false;
-            this.View.BackgroundColor = UIColor.Orange;
+             
         }
 
-        public override void ViewWillAppear(bool animated)
+       
+        public void OnClassCellTapped(object sender, GestureRecognizerEventArgs e)
         {
-            base.ViewWillAppear(animated);
+            if (e.Cell.Column == SelectIndex)
+                return;
+            SelectIndex = e.Cell.Column;
+            ((ClassTableViewSource)ClassTableView.Source).Header = null;
+            ClassTableView.ReloadData();
         }
 
-        void ClassTableView_Scrolled(object sender, EventArgs e)
+        public void OnClassCellLongPressed(object sender, GestureRecognizerEventArgs e)
         {
-            
+
         }
+
 
         private class ClassTableViewSource : UITableViewSource
         {
-            public UITableView tableView;
+            private ClassBoxViewController _cbvc;
             public ClassCellModel[][] Datas;
 
             public UITableView LeftView;
 
-            public ClassTableViewSource(UITableView tablaView, ClassCellModel[][] datas, UITableView leftView)
-            {
-                this.tableView = tablaView;
+            public ClassTableViewSource(ClassBoxViewController cbvc, ClassCellModel[][] datas, UITableView leftView)
+            { 
                 Datas = datas;
                 LeftView = leftView;
+                _cbvc = cbvc;
             }
 
             public override void Scrolled(UIScrollView scrollView)
-            {
-//                CGFloat offsetY= self.myTableView.contentOffset.y;
-//                CGPoint timeOffsetY=self.timeView.timeTableView.contentOffset;
-//                timeOffsetY.y=offsetY;
-//                self.timeView.timeTableView.contentOffset=timeOffsetY;
-//                if(offsetY==0){
-//                    self.timeView.timeTableView.contentOffset=CGPointZero;
-//                }
+            { 
                 if (LeftView == null)
                     return;
-                var offsetY = tableView.ContentOffset.Y;
+                var offsetY = _cbvc.ClassTableView.ContentOffset.Y;
                 var leftOffset = LeftView.ContentOffset;
                 LeftView.ContentOffset = new CGPoint(leftOffset.X, offsetY);
                 if (offsetY == 0)
@@ -130,30 +124,30 @@ namespace ClassBox
                 ClassRow cell = tableView.DequeueReusableCell(ClassRow.CellKey) as ClassRow;
                 // if there are no cells to reuse, create a new one
                 if (cell == null)
-                    cell = new ClassRow(); 
-                cell.WillDisplay(Datas[indexPath.Row], (int)DateTime.Now.DayOfWeek - 1);
+                    cell = new ClassRow(_cbvc); 
+                cell.WillDisplay(Datas[indexPath.Row], _cbvc.SelectIndex, indexPath.Row);
                 cell.SelectionStyle = UITableViewCellSelectionStyle.None;
                 return cell;
             }
 
-            
 
             public override nfloat GetHeightForHeader(UITableView tableView, nint section)
             {
                 return Constants.HeaderHeight;
             }
 
-            public HeaderRow header;
+
+            public HeaderRow Header;
 
             public override UIView GetViewForHeader(UITableView tableView, nint section)
             {
-                if (header == null)
+                if (Header == null)
                 {
-                    header = new HeaderRow(HeaderModelFactory.Create());
-                    header.Frame = new CGRect(0, 0, tableView.Frame.Width, Constants.HeaderHeight);
-                    header.Display((int)DateTime.Now.DayOfWeek - 1);
+                    Header = new HeaderRow(HeaderModelFactory.Create());
+                    Header.Frame = new CGRect(0, 0, tableView.Frame.Width, Constants.HeaderHeight);
+                    Header.Display(_cbvc.SelectIndex);
                 }
-                return header;
+                return Header;
             }
 
             

@@ -8,9 +8,14 @@ namespace ClassBox
     {
         public readonly ClassCellModel Model;
 
-        public ClassCell(ClassCellModel model)
+        public readonly int Row;
+        public readonly int Column;
+
+        public ClassCell(ClassCellModel model, int row, int column)
         {
             Model = model; 
+            Row = row;
+            Column = column;
             switch (model.Type)
             {
                 case ClassCellModelType.None:
@@ -26,29 +31,41 @@ namespace ClassBox
                     tv.Text = model.ClassName + Environment.NewLine + "@" + model.ClassRoom;
                     tv.Font = UIFont.SystemFontOfSize(16);
                     var ges = new UITapGestureRecognizer(r =>
-                        {
+                        { 
                             if (Tapped != null)
-                                Tapped(this, EventArgs.Empty);
+                                Tapped(this, new GestureRecognizerEventArgs(r, this));
                         });
                     tv.AddGestureRecognizer(ges);
-
+                   
                     var longes = new UILongPressGestureRecognizer(r =>
                         {
                             if (LongPressed != null)
-                                LongPressed(this, EventArgs.Empty);
+                                LongPressed(this, new GestureRecognizerEventArgs(r, this));
                         });
                     break;
             }
         }
 
-        public event EventHandler Tapped;
+        public event EventHandler<GestureRecognizerEventArgs> Tapped;
 
-        public event EventHandler LongPressed;
+        public event EventHandler<GestureRecognizerEventArgs> LongPressed;
 
         [Foundation.Export("textViewShouldBeginEditing:")]
         public bool EditingStarted(UITextView textView)
         {
             return false;
+        }
+    }
+
+    public class GestureRecognizerEventArgs :EventArgs
+    {
+        public readonly UIGestureRecognizer Recognizer;
+        public readonly ClassCell Cell;
+
+        public GestureRecognizerEventArgs(UIGestureRecognizer Recognizer, ClassCell cell)
+        {
+            this.Recognizer = Recognizer;
+            Cell = cell;
         }
     }
 }

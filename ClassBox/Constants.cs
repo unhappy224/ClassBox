@@ -5,7 +5,7 @@ namespace ClassBox
 {
     public static class Constants
     {
-        public static float CellHeight = 200f;
+        public static float CellHeight = 150f;
         public static float CellWidth = CellHeight * .6f;
 
         public static float HeaderHeight = 50f;
