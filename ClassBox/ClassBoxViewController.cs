@@ -46,10 +46,16 @@ namespace ClassBox
           
             var scv = new UIScrollView();
             View.Add(scv);
-            scv.AutoPinEdgesToSuperviewEdgesWithInsets(UIEdgeInsets.Zero);
+            scv.AutoPinEdgesToSuperviewEdgesWithInsets(new UIEdgeInsets(0, Constants.LeftWidth, 0, 0));
             scv.AddSubview(ClassTableView);
             scv.Bounces = false;
             scv.ContentSize = new CGSize(ClassTableView.Frame.Width, 0);
+
+            var leftView = new LeftTableView(LeftModelFactory.Create());
+            View.Add(leftView);
+            leftView.AutoPinEdgesToSuperviewEdgesWithInsets(UIEdgeInsets.Zero, ALEdge.Right)[0].Constant = Constants.HeaderHeight;
+            leftView.AutoPinEdge(ALEdge.Right, ALEdge.Left, scv);
+            leftView.BackgroundColor = UIColor.Green;
 
             scv.BackgroundColor = UIColor.Orange;
             View.BackgroundColor = UIColor.Orange;
@@ -79,10 +85,11 @@ namespace ClassBox
 
             public override UITableViewCell GetCell(UITableView tableView, Foundation.NSIndexPath indexPath)
             {
-                UITableViewCell cell = tableView.DequeueReusableCell(ClassRow.CellKey);
+                ClassRow cell = tableView.DequeueReusableCell(ClassRow.CellKey) as ClassRow;
                 // if there are no cells to reuse, create a new one
                 if (cell == null)
-                    cell = new ClassRow(Datas[indexPath.Row], -1); 
+                    cell = new ClassRow(); 
+                cell.WillDisplay(Datas[indexPath.Row], (int)DateTime.Now.DayOfWeek - 1);
                 cell.SelectionStyle = UITableViewCellSelectionStyle.None;
                 return cell;
             }

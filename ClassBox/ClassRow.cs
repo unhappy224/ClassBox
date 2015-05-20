@@ -8,9 +8,14 @@ namespace ClassBox
     {
         public const string CellKey = "ClassRow";
 
-        public readonly ClassCellModel[] ModelInRow;
+        public   ClassCellModel[] ModelInRow;
 
-        public ClassRow(ClassCellModel[] modelInRow, int currentSelect)
+        public ClassRow()
+        {
+           
+        }
+
+        public void WillDisplay(ClassCellModel[] modelInRow, int currentSelect)
         {
             ModelInRow = modelInRow;
             nfloat currentLeft = 0;

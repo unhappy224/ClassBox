@@ -96,11 +96,14 @@
     <Compile Include="ClassBox\ClassCellModel.cs" />
     <Compile Include="ClassBox\ClassCell.cs" />
     <Compile Include="ClassBox\ClassRow.cs" />
-    <Compile Include="ClassBox\TimeTableView.cs" />
     <Compile Include="ClassBox\Helper.cs" />
     <Compile Include="ClassBox\Constants.cs" />
     <Compile Include="ClassBox\ClassModel.cs" />
     <Compile Include="ClassBox\ClassCellModelFactory.cs" />
+    <Compile Include="ClassBox\LeftTableView.cs" />
+    <Compile Include="ClassBox\LeftModel.cs" />
+    <Compile Include="ClassBox\HeaderRow.cs" />
+    <Compile Include="ClassBox\HeaderCell.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
